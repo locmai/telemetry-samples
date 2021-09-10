@@ -1,2 +1,2 @@
-# Sample apps with Prometheus metric endpoint
+# Apps with Prometheus endpoint
 
