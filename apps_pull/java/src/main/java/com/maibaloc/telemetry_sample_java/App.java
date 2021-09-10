@@ -16,17 +16,18 @@ import java.io.IOException;
 import java.lang.Math;
 
 public class App {
-
+    static final Summary s = Summary.build().name("request_processing_seconds").labelNames("path")
+            .help("Total requests received").register();
+    static final Counter c = Counter.build().name("my_requests").help("Total requests received")
+            .labelNames("path", "method", "status").register();
     static class IndexServlet extends HttpServlet {
-        static final Summary s = Summary.build().name("request_processing_seconds").labelNames("path")
-                .help("Total requests received").register();
-        static final Counter c = Counter.build().name("my_requests").help("Total requests received").labelNames("path", "method", "status").register();
+
                 
         @Override
         protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
                 throws ServletException, IOException {
-
-            s.startTimer();
+            
+            Summary.Timer requestTimer = s.labels("/").startTimer();
 
             try {
                 resp.getWriter().println("OK - path /");
@@ -34,6 +35,7 @@ public class App {
                 c.labels("/", "GET", "200").inc();
             }
             finally {
+                requestTimer.observeDuration();
             }
         }
     }
@@ -42,20 +44,19 @@ public class App {
         @Override
         protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
                 throws ServletException, IOException {
-            // MetricWriter.s.labels("/random");
-            // Summary.Timer timer = MetricWriter.s.startTimer();
+            Summary.Timer requestTimer = s.labels("/random").startTimer();
 
             try {
                 double r = Math.random();
                 if (r < 0.5) {
-                    // MetricWriter.c.labels("/random", "GET", "503").inc();
+                    c.labels("/random", "GET", "503").inc();
                     resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
                 }
                 resp.getWriter().println("OK - path /random");
-                // MetricWriter.c.labels("/random", "GET", "200").inc();
+                c.labels("/random", "GET", "200").inc();
             }
             finally {
-                // timer.observeDuration();
+                requestTimer.observeDuration();
             }
         }
     }

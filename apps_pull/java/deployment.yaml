@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-sample-java
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: telemetry-sample-java
+  template:
+    metadata:
+      labels:
+        app: telemetry-sample-java
+    spec:
+      containers:
+      - name: telemetry-sample-java
+        image: locmai/telemetry-sample:java-0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: telemetry-sample-java
+  labels:
+    app: telemetry-sample-java
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080 # match with container port above
+    name: http
+  selector:
+    app: telemetry-sample-java
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: telemetry-sample-java
+  labels:
+    app: telemetry-sample-java
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: telemetry-sample-java
+  endpoints:
+  - port: http # name of the port serve /metrics path
+

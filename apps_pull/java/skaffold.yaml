@@ -1,0 +1,13 @@
+apiVersion: skaffold/v2beta20
+kind: Config
+metadata:
+  name: java
+build:
+  artifacts:
+  - image: locmai/telemetry-sample
+    docker:
+      dockerfile: Dockerfile
+deploy:
+  kubectl:
+    manifests:
+    - deployment.yaml
