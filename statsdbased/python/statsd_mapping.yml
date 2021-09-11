@@ -2,4 +2,4 @@ mappings:
 - match: "my.requests"
   name: "my_requests_count"
   labels:
-    client: "statsd"
+    local_client: "statsd"

@@ -10,9 +10,6 @@ statsd_client = statsd.StatsClient('0.0.0.0', 9125)
 
 app = Flask(__name__)
 
-# s = Summary('request_processing_seconds', 'Time spent processing request', ['path'])
-# c = Counter('my_requests', 'Total requests received', ['path','method', 'status'])
-
 def timer(path):
     def wrap(func):
         def wrapped_f(*args):
