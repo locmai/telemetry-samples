@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: telemetry-sample-python
-        image: locmai/telemetry-sample:python-0
+        image: locmai/telemetry-sample:statsd-python-0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -35,20 +35,3 @@ spec:
     name: http
   selector:
     app: telemetry-sample-python
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: telemetry-sample-python
-  labels:
-    app: telemetry-sample-python
-    client: statsd
-    release: kube-prometheus-stack
-spec:
-  selector:
-    matchLabels:
-      app: telemetry-sample-python
-      client: statsd
-  endpoints:
-  - port: http # name of the port serve /metrics path
-

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: telemetry-sample-java
-        image: locmai/telemetry-sample:java-0
+        image: locmai/telemetry-sample:promethues-java-0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
