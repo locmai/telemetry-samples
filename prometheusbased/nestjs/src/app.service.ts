@@ -41,13 +41,13 @@ export class AppService {
 
     const random = Math.random();
     if (random < 0.5) {
-      this._counter.labels('/', '/random', '503').inc(1);
+      this._counter.labels('/random', 'GET', '503').inc(1);
       throw new HttpException(
         'Service Unavailable',
         HttpStatus.SERVICE_UNAVAILABLE,
       );
     } else {
-      this._counter.labels('/', '/random', '200').inc(1);
+      this._counter.labels('/random', '/GET', '200').inc(1);
       return '<p>OK - path: /random</p>';
     }
   }
