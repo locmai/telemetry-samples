@@ -1,0 +1,19 @@
+{
+  "name": "telemetry-sample-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.0.3",
+    "@opentelemetry/exporter-prometheus": "^0.25.0",
+    "@opentelemetry/sdk-metrics-base": "^0.25.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.13"
+  }
+}
