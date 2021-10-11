@@ -1,27 +1,15 @@
-"use strict";
 const express = require("express");
-const { DiagConsoleLogger, DiagLogLevel, diag } = require("@opentelemetry/api");
-
+const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 const { MeterProvider } = require("@opentelemetry/sdk-metrics-base");
-const { OTLPMetricExporter } = require("@opentelemetry/exporter-otlp-http");
-const { Resource } = require("@opentelemetry/resources");
-const {
-  SemanticResourceAttributes,
-} = require("@opentelemetry/semantic-conventions");
 
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
-
-const metricExporter = new OTLPMetricExporter({
-  // url: 'http://localhost:55681/v1/metrics',
-});
+const prometheusPort = 9091;
+const options = { port: prometheusPort, startServer: true };
+const exporter = new PrometheusExporter(options);
 
 const meter = new MeterProvider({
-  exporter: metricExporter,
+  exporter,
   interval: 1000,
-  resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: "basic-metric-service",
-  }),
-}).getMeter("example-exporter-collector");
+}).getMeter("prometheus");
 
 const valueRecorder = meter.createValueRecorder("request_processing_seconds", {
   description: "Time spent processing request",
@@ -37,9 +25,7 @@ const host = "0.0.0.0";
 
 app.get("/", (req, res) => {
   const startTimestamp = Date.now();
-  const sleep = async () => {
-    await sleep(Math.random() * 1000);
-  };
+  const sleep = async () => { await sleep(Math.random() * 1000); }
   const latency = Date.now() - startTimestamp;
   valueRecorder.bind({ path: "/", method: "GET", status: 200 }).record(latency);
   counter.bind({ path: "/", method: "GET", status: 200 }).add(1);
@@ -58,11 +44,9 @@ app.get("/random", (req, res) => {
       .bind({ path: "/random", method: "GET", status: 503 })
       .record(latency);
     counter.bind({ path: "/random", method: "GET", status: 503 }).add(1);
-    res.status(503).send("<p>HTTP Error 503</p>");
+    res.status(503).send("<p>HTTP Error 503</p>");  
   } else {
-    valueRecorder
-      .bind({ path: "/random", method: "GET", status: 200 })
-      .record(latency);
+    valueRecorder.bind({ path: "/random", method: "GET", status: 200 }).record(latency);
     counter.bind({ path: "/random", method: "GET", status: 200 }).add(1);
     res.send("<p>OK - path: /random</p>");
   }
@@ -75,5 +59,6 @@ function sleep(ms) {
 }
 
 app.listen(port, host, () => {
+  console.log(`> Metrics are exposed at http://${host}:${prometheusPort}/metrics`);
   console.log(`> Telemetry app listening at http://${host}:${port}`);
 });

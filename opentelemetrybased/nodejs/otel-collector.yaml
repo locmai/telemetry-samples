@@ -1,0 +1,33 @@
+receivers:
+  statsd:
+    endpoint: "0.0.0.0:8127"
+    aggregation_interval: 5s
+    enable_metric_type: true
+    is_monotonic_counter: true
+  otlp:
+    protocols:
+      grpc:
+      http:
+        cors_allowed_origins:
+        - http://*
+        - https://*
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:9091"
+    metric_expiration: 1m
+    send_timestamps: false
+  file:
+    path: ./metrics.json
+extensions:
+  health_check:
+  pprof:
+  zpages:
+
+service:
+  pipelines:
+    metrics/statsd:
+      receivers: [statsd]
+      exporters: [prometheus,file]
+    metrics/otlp:
+      receivers: [otlp]
+      exporters: [prometheus,file]
