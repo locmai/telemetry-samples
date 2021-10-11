@@ -26,7 +26,9 @@ const host = "0.0.0.0";
 app.get("/", (req, res) => {
   const startTimestamp = Date.now();
   const latency = Date.now() - startTimestamp;
-  valueRecorder.bind({ path: "/", method: "GET", status: 200 }).record(latency);
+  valueRecorder
+    .bind({ path: "/", method: "GET", status: 200 })
+    .record(Math.random() * 1000);
   counter.bind({ path: "/", method: "GET", status: 200 }).add(1);
   res.send("<p>OK - path: /</p>");
 });
@@ -34,14 +36,11 @@ app.get("/", (req, res) => {
 app.get("/random", (req, res) => {
   const startTimestamp = Date.now();
   const random = Math.random();
-  const sleep = (waitTimeInMs) =>
-    new Promise((resolve) => setTimeout(resolve, waitTimeInMs));
-  sleep(Math.random() * 10000);
   const latency = Date.now() - startTimestamp;
   if (random < 0.5) {
     valueRecorder
       .bind({ path: "/random", method: "GET", status: 503 })
-      .record(latency);
+      .record(Math.random() * 1000);
     counter.bind({ path: "/random", method: "GET", status: 503 }).add(1);
     res.status(503).send("<p>HTTP Error 503</p>");  
   } else {
